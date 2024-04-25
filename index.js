@@ -44,6 +44,9 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 
 app.use(express.json());
 app.use(cors());
+
+app.use('/',paymentRoute);
+
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
