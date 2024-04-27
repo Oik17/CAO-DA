@@ -16,6 +16,9 @@ const userSchema=new mongoose.Schema({
     refreshToken: {
         type: String
     },
+    role: {
+        type: String
+    },
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "product" }],
 
 })
