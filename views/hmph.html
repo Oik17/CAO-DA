@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dak Ghar Niryat Kendra</title>
+    <style>
+      /* Add your CSS styles here */
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React Library -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const ProductList = () => {
+        const [products, setProducts] = useState([]);
+
+        useEffect(() => {
+          fetch('/api/products')
+            .then(response => response.json())
+            .then(data => setProducts(data))
+            .catch(error => console.error('Error fetching products:', error));
+        }, []);
+
+        return (
+          <div>
+            <h1>Dak Ghar Niryat Kendra</h1>
+            <ul>
+              {products.map(product => (
+                <li key={product._id}>
+                  <img src={product.imageUrl} alt={product.name} />
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                  <p>Price: {product.price}</p>
+                  <button>Add to Cart</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      };
+
+      const App = () => {
+        return (
+          <div>
+            <ProductList />
+          </div>
+        );
+      };
+
+      ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+  </body>
+</html>

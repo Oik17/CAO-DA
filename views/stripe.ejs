@@ -1,0 +1,46 @@
+<!-- Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<form id="payment-form">
+  <div id="payment-element">
+    <!-- Stripe.js injects the Payment Element -->
+  </div>
+  <button id="submit">Pay</button>
+</form>
+
+<script>
+  const stripePublishableKey = '<%- stripePublishableKey %>';
+  // Now you can use stripePublishableKey to initialize Stripe.js
+  const stripe = Stripe(stripePublishableKey);
+  const form = document.getElementById('payment-form');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+      const { client_secret } = await fetch('http://127.0.0.1:8000/payments/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 1000 }), // Amount in cents
+      }).then((res) => res.json());
+
+      const elements = stripe.elements({ clientSecret: client_secret });
+      const paymentElement = elements.create('payment');
+      paymentElement.mount('#payment-element');
+
+      const result = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          payment_method_data: {},
+          return_url: 'http://127.0.0.1:8000/success',
+        },
+        redirect: 'if_required',
+      });
+
+      if (result.error) {
+        console.error(result.error.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+</script>
