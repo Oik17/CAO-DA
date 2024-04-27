@@ -60,7 +60,7 @@ async function uploadSeller(req,res){
 async function getProduct(req,res){
     try{
       const productAll=await seller.find()
-      if(ProductAll.length==0){
+      if(productAll.length==0){
         return res.status(404).json({
           message: "no data found",
           status: false
