@@ -1,46 +1,112 @@
-<!-- Load Stripe.js -->
-<script src="https://js.stripe.com/v3/"></script>
-
-<form id="payment-form">
-  <div id="payment-element">
-    <!-- Stripe.js injects the Payment Element -->
-  </div>
-  <button id="submit">Pay</button>
-</form>
-
-<script>
-  const stripePublishableKey = '<%- stripePublishableKey %>';
-  // Now you can use stripePublishableKey to initialize Stripe.js
-  const stripe = Stripe(stripePublishableKey);
-  const form = document.getElementById('payment-form');
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    try {
-      const { client_secret } = await fetch('http://127.0.0.1:8000/payments/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 1000 }), // Amount in cents
-      }).then((res) => res.json());
-
-      const elements = stripe.elements({ clientSecret: client_secret });
-      const paymentElement = elements.create('payment');
-      paymentElement.mount('#payment-element');
-
-      const result = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          payment_method_data: {},
-          return_url: 'http://127.0.0.1:8000/success',
-        },
-        redirect: 'if_required',
-      });
-
-      if (result.error) {
-        console.error(result.error.message);
-      }
-    } catch (err) {
-      console.error(err);
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dak Ghar Niryat Kendra - Payments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #f5f5f5;
     }
-  });
-</script>
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      color: #007bff;
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      color: #3f3f3f;
+      font-size: 1.2rem;
+    }
+    #payment-form {
+      width: 500px;
+      margin: 0 auto;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      transition: transform 0.3s ease-in-out;
+    }
+    #payment-form:hover {
+      transform: translateY(-5px);
+    }
+    #payment-element {
+      margin-bottom: 1rem;
+    }
+    button#submit {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    button#submit:hover {
+      background-color: #0062cc;
+    }
+    .payment-image {
+      width: 100%;
+      height: auto;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Dak Ghar Niryat Kendra</h1>
+    <p>Payment Information</p>
+  </div>
+
+  <div id="root"></div>
+
+  <form id="payment-form">
+    <div id="payment-element"></div>
+    <button id="submit">Pay</button>
+  </form>
+  
+  <!-- Load Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
+  
+  <script>
+    const stripePublishableKey = '<%- stripePublishableKey %>';
+    // Now you can use stripePublishableKey to initialize Stripe.js
+    const stripe = Stripe(stripePublishableKey);
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      try {
+        const { client_secret } = await fetch('http://127.0.0.1:8000/payments/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: 1000 }), // Amount in cents
+        }).then((res) => res.json());
+
+        const elements = stripe.elements({ clientSecret: client_secret });
+        const paymentElement = elements.create('payment');
+        paymentElement.mount('#payment-element');
+
+        const result = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            payment_method_data: {},
+            return_url: 'http://127.0.0.1:8000/success',
+          },
+          redirect: 'if_required',
+        });
+
+        if (result.error) {
+          console.error(result.error.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
