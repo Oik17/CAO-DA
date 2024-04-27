@@ -21,7 +21,8 @@ async function signup(req,res){
                 password: hashedPassword
             })
             newUser.save()
-            res.status(201).send("User created\n"+newUser)
+            res.status(201).json({ message: "User created successfully", user: newUser });
+
         }
     }
     catch(err){
@@ -47,10 +48,12 @@ async function login(req,res){
             res.status(201).json({accessToken: accessToken, refreshToken: refreshToken});
         }
         else{
-            res.status(500).send("Incorrect password");
+            console.log("uh")
+            res.status(500).json({message:"Incorrect password"});
         }
         
     } catch(err){
+        console.log(err)
         res.status(500).send(err);
     }
 }
