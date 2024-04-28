@@ -1,109 +1,150 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Dak Ghar Niryat Kendra - Payments</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-      background-color: #f5f5f5;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .header h1 {
-      color: #007bff;
-      margin-bottom: 0.5rem;
-    }
-    .header p {
-      color: #3f3f3f;
-      font-size: 1.2rem;
-    }
-    #payment-form {
-      width: 500px;
-      margin: 0 auto;
-      background-color: white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      padding: 1rem;
-      transition: transform 0.3s ease-in-out;
-    }
-    #payment-form:hover {
-      transform: translateY(-5px);
-    }
-    #payment-element {
-      margin-bottom: 1rem;
-    }
-    button#submit {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      width: 100%;
-    }
-    button#submit:hover {
-      background-color: #0062cc;
-    }
-    .payment-image {
-      width: 100%;
-      height: auto;
-      margin-bottom: 1rem;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>Dak Ghar Niryat Kendra</h1>
-    <p>Payment Information</p>
-  </div>
-
-  <div id="root"></div>
-
-  <form id="payment-form">
-    <div id="payment-element"></div>
-    <button id="submit">Pay</button>
-  </form>
-  <script src="https://js.stripe.com/v3/"></script>
-  
-  <script>
-    const stripePublishableKey = '<%- stripePublishableKey %>';
-    const stripe = Stripe(stripePublishableKey);
-    const form = document.getElementById('payment-form');
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-
-      try {
-        const { client_secret } = await fetch('http://127.0.0.1:8000/payments/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: 1000 }), // Amount in cents
-        }).then((res) => res.json());
-
-        const elements = stripe.elements({ clientSecret: client_secret });
-        const paymentElement = elements.create('payment');
-        paymentElement.mount('#payment-element');
-
-        const result = await stripe.confirmPayment({
-          elements,
-          confirmParams: {
-            payment_method_data: {},
-            return_url: 'http://127.0.0.1:8000/success',
-          },
-          redirect: 'if_required',
-        });
-
-        if (result.error) {
-          console.error(result.error.message);
-        }
-      } catch (err) {
-        console.error(err);
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dak Ghar Niryat Kendra - Payments</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: #f5f5f5;
       }
-    });
-  </script>
-</body>
+      .header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .header h1 {
+        color: #007bff;
+        margin-bottom: 0.5rem;
+      }
+      .header p {
+        color: #3f3f3f;
+        font-size: 1.2rem;
+      }
+      #payment-form {
+        width: 500px;
+        margin: 0 auto;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        transition: transform 0.3s ease-in-out;
+      }
+      #payment-form:hover {
+        transform: translateY(-5px);
+      }
+      #payment-element {
+        margin-bottom: 1rem;
+      }
+      button#submit {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        width: 100%;
+      }
+      button#submit:hover {
+        background-color: #0062cc;
+      }
+      .payment-image {
+        width: 100%;
+        height: auto;
+        margin-bottom: 1rem;
+      }
+      #map {
+        width: 500px;
+        height: 300px;
+        margin: 2rem auto 0;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Dak Ghar Niryat Kendra</h1>
+      <p>Payment Information</p>
+    </div>
+    <div id="root"></div>
+    <form id="payment-form">
+      <div id="payment-element"></div>
+      <button id="submit">Pay</button>
+    </form>
+    <div id="map"></div>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      const stripePublishableKey = '<%- stripePublishableKey %>';
+      const stripe = Stripe(stripePublishableKey);
+      const form = document.getElementById('payment-form');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        try {
+          const { client_secret } = await fetch(
+            'http://127.0.0.1:8000/payments/create-payment-intent',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ amount: 1000 }), // Amount in cents
+            }
+          ).then((res) => res.json());
+          const elements = stripe.elements({ clientSecret: client_secret });
+          const paymentElement = elements.create('payment');
+          paymentElement.mount('#payment-element');
+          const result = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+              payment_method_data: {},
+              return_url: 'http://127.0.0.1:8000/success',
+            },
+            redirect: 'if_required',
+          });
+          if (result.error) {
+            console.error(result.error.message);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      // Initialize the map
+      function initMap() {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var map = L.map('map').setView([lat, lon], 13);
+            L.tileLayer(
+              'https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=695383fc8amshe2de6b6b8b42f69p12c710jsn0e38bfd74c27',
+              {
+                attribution:
+                  'Tiles &copy: <a href="https://www.maptilesapi.com/">MapTiles API</a>, Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19,
+              }
+            ).addTo(map);
+          },
+          function () {
+            alert('Could not get your location');
+          }
+        );
+      }
+
+      initMap();
+    </script>
+  </body>
 </html>

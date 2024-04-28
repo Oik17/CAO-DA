@@ -8,6 +8,8 @@ const socketIO = require('socket.io');
 const sellerRoute=require('./routes/sellerRoute')
 const paymentRoute=require('./routes/paymentRoute')
 const bodyParser = require('body-parser');
+const axios = require('axios');
+
 
 const app = express();
 const port = process.env.PORT;
@@ -59,6 +61,29 @@ io.on('connection', (socket) => {
 app.get('/socket.io/socket.io.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist', 'socket.io.js'));
 });
+
+
+
+app.get('/fetchImage', async (req, res) => {
+  const options = {
+    method: 'GET',
+    url: 'https://maptiles.p.rapidapi.com/es/map/v1/3/4/2.png',
+    headers: {
+      'X-RapidAPI-Key': '695383fc8amshe2de6b6b8b42f69p12c710jsn0e38bfd74c27',
+      'X-RapidAPI-Host': 'maptiles.p.rapidapi.com'
+    }
+  };
+
+  try {
+    const response = await axios.request(options);
+    res.set('Content-Type', 'image/png'); // Set the content type to image/png
+    res.send(response.data); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error'); // Return a 500 error if something went wrong
+  }
+});
+
 
 server.listen(port, () => {
   console.log(`Listening on port ${port}`);
