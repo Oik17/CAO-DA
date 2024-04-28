@@ -1,7 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPEAPI_SECRET_KEY);
 
-
-
 async function paymentsController(req, res){
     try {
       const paymentIntent = await stripe.paymentIntents.create({

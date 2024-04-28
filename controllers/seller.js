@@ -79,7 +79,36 @@ async function getProduct(req,res){
     }
 
 }
+
+async function getProductByCategory(req, res) {
+  try {
+      let products;
+      if (req.query.category) {
+          products = await seller.find({ category: req.query.category });
+      } else {
+          products = await seller.find();
+      }
+      if (products.length == 0) {
+          return res.status(404).json({
+              message: "No products found for the specified category",
+              status: false
+          });
+      } else {
+          return res.status(200).json(products);
+      }
+  } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+          message: "Error fetching products",
+          data: err,
+          status: false
+      });
+  }
+}
+
+
 module.exports={
   uploadSeller,
-  getProduct
+  getProduct,
+  getProductByCategory
 }
