@@ -68,13 +68,10 @@
     <div id="payment-element"></div>
     <button id="submit">Pay</button>
   </form>
-  
-  <!-- Load Stripe.js -->
   <script src="https://js.stripe.com/v3/"></script>
   
   <script>
     const stripePublishableKey = '<%- stripePublishableKey %>';
-    // Now you can use stripePublishableKey to initialize Stripe.js
     const stripe = Stripe(stripePublishableKey);
     const form = document.getElementById('payment-form');
     form.addEventListener('submit', async (event) => {

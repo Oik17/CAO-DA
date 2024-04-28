@@ -102,6 +102,8 @@
         window.location.href = 'http://127.0.0.1:8000/';
       };
 
+      const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+
       return (
         <div>
           <ul>
@@ -119,10 +121,11 @@
           <ul>
             {cart.map(item => (
               <li key={item._id}>
-                {item.name} - {item.price}
+                {item.item} - ${item.price}
               </li>
             ))}
           </ul>
+          <p>Total Price: ${totalPrice}</p>
           <button onClick={buy}>Buy</button>
         </div>
       );

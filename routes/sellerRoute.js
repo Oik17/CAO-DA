@@ -6,7 +6,7 @@ const storage = multer.memoryStorage()
 const uploadImage = multer({ storage: storage })
 
 const {uploadSeller,getProduct}=require('../controllers/seller')
-//const {authenticateToken}= require('../middleware/authenticate')
+const {authenticateToken}= require('../middleware/authenticate')
 
 router.get('/test', (req, res) => {
   res.send("hello");
