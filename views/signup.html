@@ -55,7 +55,7 @@
     </style>
 </head>
 <body>
-    <form id="signup-form" action="#">
+    <form id="signup-form" action="">
         <h2>Sign Up</h2>
         <input type="text" id="name" placeholder="Name" required>
         <input type="email" id="email" placeholder="Email" required>
@@ -86,6 +86,8 @@
                 });
                 const data = await response.json();
                 alert(data.message);
+                window.location.href = 'http://127.0.0.1:5500/views/login.html';
+            
             } catch (error) {
                 console.error('Error:', error);
             }

@@ -82,7 +82,8 @@
                 })
             });
             const data = await response.json();
-            alert(data.accessToken);
+            window.location.href = 'http://127.0.0.1:5500/views/question.html';
+            
         } catch (error) {
             console.error('Error:', error);
         }
