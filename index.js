@@ -69,18 +69,18 @@ app.get('/fetchImage', async (req, res) => {
     method: 'GET',
     url: 'https://maptiles.p.rapidapi.com/es/map/v1/3/4/2.png',
     headers: {
-      'X-RapidAPI-Key': '695383fc8amshe2de6b6b8b42f69p12c710jsn0e38bfd74c27',
-      'X-RapidAPI-Host': 'maptiles.p.rapidapi.com'
+      'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+      'X-RapidAPI-Host': process.env.RAPIDAPI_HOST,
     }
   };
 
   try {
     const response = await axios.request(options);
-    res.set('Content-Type', 'image/png'); // Set the content type to image/png
+    res.set('Content-Type', 'image/png'); 
     res.send(response.data); 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error'); // Return a 500 error if something went wrong
+    res.status(500).send('Internal Server Error'); 
   }
 });
 
