@@ -117,10 +117,12 @@
       if (response.ok) {
         alert('Product uploaded successfully!');
         form.reset();
+        window.location.href = './products.html';
       } else {
         alert('Error uploading product.');
       }
     });
   </script>
+  
 </body>
 </html>

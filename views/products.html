@@ -13,14 +13,17 @@
     }
     .header {
       text-align: center;
-      margin-bottom: 2rem;
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem;
+      width: 100%;
+      box-sizing: border-box; /* Ensure padding is included in width calculation */
     }
+    
     .header h1 {
-      color: #007bff;
       margin-bottom: 0.5rem;
     }
     .header p {
-      color: #3f3f3f;
       font-size: 1.2rem;
     }
     ul {
@@ -88,33 +91,34 @@
       const [products, setProducts] = useState([]);
       const [cart, setCart] = useState([]);
       const [selectedCategory, setSelectedCategory] = useState("");
-
+    
       const fetchProducts = () => {
         let url = 'http://127.0.0.1:8000/seller/getProductsByCategory';
         if (selectedCategory) {
           url += `?category=${selectedCategory}`;
         }
-
+    
         fetch(url)
           .then(response => response.json())
           .then(data => setProducts(data))
           .catch(error => console.error('Error fetching products:', error));
       };
-
+    
       useEffect(() => {
         fetchProducts();
       }, [selectedCategory]);
-
+    
       const addToCart = (product) => {
         setCart(prevCart => [...prevCart, product]);
       };
-
-      const buy = () => {
-        window.location.href = 'http://127.0.0.1:8000/';
+    
+      const buy = (totalPrice) => {
+        const url = `http://127.0.0.1:8000/?totalPrice=${totalPrice}`;
+        window.location.href = url;
       };
-
+    
       const totalPrice = cart.reduce((total, item) => total + item.price, 0);
-
+    
       return (
         <div>
           <select id="categorySelect" onChange={(e) => setSelectedCategory(e.target.value)}>
@@ -151,7 +155,7 @@
             ))}
           </ul>
           <p>Total Price: ${totalPrice}</p>
-          <button onClick={buy}>Buy</button>
+          <button onClick={() => buy(totalPrice)}>Buy</button>
         </div>
       );
     };
